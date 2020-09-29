@@ -31,7 +31,7 @@ _fcpd() {
         return
     fi
 
-    if [[ "$1" == '/' ]]
+    if [[ $1 == '/' ]]
     then
         for dir in ${dirs[@]}
         do
