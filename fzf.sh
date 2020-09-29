@@ -98,3 +98,25 @@ f() {
         _f $@
     fi
 }
+
+_fcomplete() { 
+    local -a cmds=('cd' 'history' 'git')
+    _arguments \
+    "1: :{_describe 'command' cmds}" \
+    '*:: :->args'
+
+    case $state in
+        args)
+            case $words[1] in
+                cd)            
+                    _arguments \
+                        '--max-depth[max search depth]'
+                    ;;
+                git)
+                    _alternative 'git:git:_git_commands'
+                    ;;
+            esac
+    esac
+}
+
+compdef _fcomplete f
