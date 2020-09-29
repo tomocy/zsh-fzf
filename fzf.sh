@@ -13,7 +13,7 @@ _fzf_compgen_dir() {
 }
 
 _f() {
-    local arg=$(fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) ${@:2} | fzf) &&
+    local arg=$(fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) . ${@:2} | fzf) &&
     test -n "$arg" && 
     print -z -- "$1 $arg"
 }
@@ -82,25 +82,18 @@ FZF-EOF"
 }
 
 _fgit() {
-    if [[ $1 == 'checkout' ]]
+    local cmd="_fgit$1"
+    if type $cmd > /dev/null 2>&1
     then
-        _fgitcheckout ${@:2}
-    elif [[ $1 == 'show' ]]
-    then
-        _fgitshow ${@:2}
+        $cmd ${@:2}
     fi
 }
 
 f() {
-    if [[ $1 == 'cd' ]]
+    local cmd="_f$1"
+    if type $cmd > /dev/null 2>&1
     then
-        _fcd ${@:2}
-    elif [[ $1 == 'history' ]]
-    then
-        _fhistory ${@:2}
-    elif [[ $1 == 'git' ]]
-    then
-        _fgit ${@:2}
+        $cmd ${@:2}
     else
         _f $@
     fi
