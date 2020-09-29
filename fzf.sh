@@ -62,19 +62,19 @@ fhistory() {
 }
 
 fgit() {
-    local $args=${@:2}
     if [[ $1 == 'checkout' ]]
     then
-        _fgitcheckout $args
+        _fgitcheckout ${@:2}
     elif [[ $1 == 'show' ]]
     then
-        _fgitshow $args
+        _fgitshow ${@:2}
     fi
 }
 
 _fgitcheckout() {
-  local branches=$(git branch --all | grep -v HEAD) &&
-  local branch=$(echo "$branches" | fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  local branches=$(git branch | grep -v HEAD) &&
+  local branch=$(echo "$branches" | fzf +m) &&
+  test -n "$branch" &&
   git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
 }
 
@@ -85,7 +85,7 @@ _fgitshow() {
         --bind=ctrl-s:toggle-sort \
         --bind "ctrl-m:execute:
                 (grep -o '[a-f0-9]\{7\}' | head -1 |
-                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
-                {}
+                xargs -I % sh -c 'git show --color=always % | less -R') << FZF-EOF
+{}
 FZF-EOF"
 }
