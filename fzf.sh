@@ -17,7 +17,7 @@ _f() {
     print -z -- "$1 $arg"
 }
 
-__fcd() {
+_fccd() {
     local args=$(echo "$@" | awk '{gsub("-t [a-zA-Z]|--type [a-zA-Z]", "", $0);print $0}' | xargs) &&
     _f cd $(echo $args) --type d
 }
@@ -53,22 +53,12 @@ _fcd() {
     then
         _fcpd
     else
-        __fcd $@
+        _fccd $@
     fi
 }
 
 _fhistory() {
     print -z -- "$(history $@ | fzf +s --tac | sed -E 's/ *[0-9]*\*? *//' | sed -E 's/\\/\\\\/g')"
-}
-
-_fgit() {
-    if [[ $1 == 'checkout' ]]
-    then
-        _fgitcheckout ${@:2}
-    elif [[ $1 == 'show' ]]
-    then
-        _fgitshow ${@:2}
-    fi
 }
 
 _fgitcheckout() {
@@ -88,6 +78,16 @@ _fgitshow() {
                 xargs -I % sh -c 'git show --color=always % | less -R') << FZF-EOF
 {}
 FZF-EOF"
+}
+
+_fgit() {
+    if [[ $1 == 'checkout' ]]
+    then
+        _fgitcheckout ${@:2}
+    elif [[ $1 == 'show' ]]
+    then
+        _fgitshow ${@:2}
+    fi
 }
 
 f() {
