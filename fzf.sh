@@ -12,14 +12,14 @@ _fzf_compgen_dir() {
   fd --type d $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) . "$1"
 }
 
-f() {
+_f() {
     local arg=$(fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) ${@:2} | fzf) && test -n "$arg" && 
     print -z -- "$1 $arg"
 }
 
-_fcd() {
+__fcd() {
     local args=$(echo "$@" | awk '{gsub("-t [a-zA-Z]|--type [a-zA-Z]", "", $0);print $0}' | xargs) &&
-    f cd $(echo $args) --type d
+    _f cd $(echo $args) --type d
 }
 
 _fcpd() {
@@ -48,20 +48,20 @@ _fcpd() {
 }
 
 
-fcd() {
+_fcd() {
     if [[ $1 == '..' ]]
     then
         _fcpd
     else
-        _fcd $@
+        __fcd $@
     fi
 }
 
-fhistory() {
+_fhistory() {
     print -z -- "$(history $@ | fzf +s --tac | sed -E 's/ *[0-9]*\*? *//' | sed -E 's/\\/\\\\/g')"
 }
 
-fgit() {
+_fgit() {
     if [[ $1 == 'checkout' ]]
     then
         _fgitcheckout ${@:2}
@@ -88,4 +88,19 @@ _fgitshow() {
                 xargs -I % sh -c 'git show --color=always % | less -R') << FZF-EOF
 {}
 FZF-EOF"
+}
+
+f() {
+    if [[ $1 == 'cd' ]]
+    then
+        _fcd ${@:2}
+    elif [[ $1 == 'history' ]]
+    then
+        _fhistory ${@:2}
+    elif [[ $1 == 'git' ]]
+    then
+        _fgit ${@:2}
+    else
+        _f $@
+    fi
 }
