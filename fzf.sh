@@ -54,3 +54,7 @@ fcd() {
         _fcd $@
     fi
 }
+
+fhistory() {
+    print -z -- "$(history $@ | fzf +s --tac | sed -E 's/ *[0-9]*\*? *//' | sed -E 's/\\/\\\\/g')"
+}
