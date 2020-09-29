@@ -13,11 +13,12 @@ _fzf_compgen_dir() {
 }
 
 f() {
-    local arg=$(fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) ${@:2} | fzf) && test -n "$arg" && print -z -- "$1 $arg"
+    local arg=$(fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) ${@:2} | fzf) && test -n "$arg" && 
+    print -z -- "$1 $arg"
 }
 
 _fcd() {
-    args=$(echo "$@" | awk '{gsub("-t [a-zA-Z]|--type [a-zA-Z]", "", $0);print $0}' | xargs)
+    local args=$(echo "$@" | awk '{gsub("-t [a-zA-Z]|--type [a-zA-Z]", "", $0);print $0}' | xargs) &&
     f cd $(echo $args) --type d
 }
 
@@ -42,7 +43,8 @@ _fcpd() {
     fi
   }
 
-  local dir=$(get_parent_dirs $(realpath ${1:-$PWD}) | fzf) && cd $dir
+  local dir=$(get_parent_dirs $(realpath ${1:-$PWD}) | fzf) && 
+  cd $dir
 }
 
 
@@ -57,4 +59,33 @@ fcd() {
 
 fhistory() {
     print -z -- "$(history $@ | fzf +s --tac | sed -E 's/ *[0-9]*\*? *//' | sed -E 's/\\/\\\\/g')"
+}
+
+fgit() {
+    local $args=${@:2}
+    if [[ $1 == 'checkout' ]]
+    then
+        _fgitcheckout $args
+    elif [[ $1 == 'show' ]]
+    then
+        _fgitshow $args
+    fi
+}
+
+_fgitcheckout() {
+  local branches=$(git branch --all | grep -v HEAD) &&
+  local branch=$(echo "$branches" | fzf-tmux -d $(( 2 + $(wc -l <<< "$branches") )) +m) &&
+  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+}
+
+_fgitshow() {
+    git log --graph --color=always \
+        --format="%C(auto)%h%d %s %C(black)%C(bold)%cr" "$@" |
+    fzf --ansi --no-sort --reverse --tiebreak=index \
+        --bind=ctrl-s:toggle-sort \
+        --bind "ctrl-m:execute:
+                (grep -o '[a-f0-9]\{7\}' | head -1 |
+                xargs -I % sh -c 'git show --color=always % | less -R') << 'FZF-EOF'
+                {}
+FZF-EOF"
 }
