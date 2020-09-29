@@ -1,19 +1,21 @@
 #!/bin/zsh
 
-set -eu
-
-_fcd() {
-    local opt
+ffind() {
     local maxdepth_opt='-maxdepth 1'
-    while getopts ad: opt
+    local type_opt
+    while getopts d:t: opt
     do
         case $opt in
-            a) maxdepth_opt='';;
             d) maxdepth_opt="-maxdepth $OPTARG";;
+            t) type_opt="-type $OPTARG";;
         esac
     done
 
-    local dir=$(find * $(echo $maxdepth_opt) -type d -print 2> /dev/null | fzf-tmux) && cd "$dir"
+    echo "$(find * $(echo $maxdepth_opt) $(echo $type_opt) -print 2> /dev/null | fzf-tmux)"
+}
+
+_fcd() {
+    local dir=$(ffind $(echo $maxdepth_opt) -t d) && cd "$dir"
 }
 
 _fcpd() {
@@ -42,12 +44,10 @@ _fcpd() {
 
 
 fcd() {
-    set +u
     if [[ $1 == '..' ]]
     then
         _fcpd
     else
         _fcd $@
     fi
-    set -u
 }
