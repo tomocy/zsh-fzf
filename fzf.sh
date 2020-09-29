@@ -13,7 +13,8 @@ _fzf_compgen_dir() {
 }
 
 _f() {
-    local arg=$(fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) ${@:2} | fzf) && test -n "$arg" && 
+    local arg=$(fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) ${@:2} | fzf) &&
+    test -n "$arg" && 
     print -z -- "$1 $arg"
 }
 
