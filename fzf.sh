@@ -1,6 +1,6 @@
 #!/bin/zsh
 
-export FZF_DEFAULT_OPTS="--extended --cycle --tac --ansi --multi"
+export FZF_DEFAULT_OPTS="--extended --cycle --tac --ansi --multi --color 16 --prompt '👉 '"
 export TOMOCY_FD_DEFAULT_COMMAND_OPTS='--hidden --follow --exclude .git'
 export FZF_DEFAULT_COMMAND="fd $TOMOCY_FZF_DEFAULT_COMMAND_OPTS . ."
 
