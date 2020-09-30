@@ -1,19 +1,19 @@
 #!/bin/zsh
 
 export FZF_DEFAULT_OPTS="--extended --cycle --tac --ansi --multi"
-export TOMOCY_FZF_DEFAULT_COMMAND_OPTS='--hidden --follow --exclude .git'
-export FZF_DEFAULT_COMMAND='fd --type f $TOMOCY_FZF_DEFAULT_COMMAND_OPTS'
+export TOMOCY_FD_DEFAULT_COMMAND_OPTS='--hidden --follow --exclude .git'
+export FZF_DEFAULT_COMMAND="fd $TOMOCY_FZF_DEFAULT_COMMAND_OPTS . ."
 
 _fzf_compgen_path() {
-  fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) . "$1"
+  fd $(echo $TOMOCY_FD_DEFAULT_COMMAND_OPTS) . "$1"
 }
 
 _fzf_compgen_dir() {
-  fd --type d $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) . "$1"
+  fd --type d $(echo $TOMOCY_FD_DEFAULT_COMMAND_OPTS) . "$1"
 }
 
 _f() {
-    local arg=$(fd $(echo $TOMOCY_FZF_DEFAULT_COMMAND_OPTS) . ${@:2} | fzf) &&
+    local arg=$(fd $(echo $TOMOCY_FD_DEFAULT_COMMAND_OPTS) . ${@:2} | fzf) &&
     test -n "$arg" && 
     print -z -- "$1 $arg"
 }
@@ -45,9 +45,8 @@ _fcpd() {
   }
 
   local dir=$(get_parent_dirs $(realpath ${1:-$PWD}) | fzf) && 
-  cd $dir
+  print -z -- "cd $dir"
 }
-
 
 _fcd() {
     if [[ $1 == '..' ]]
@@ -58,15 +57,11 @@ _fcd() {
     fi
 }
 
-_fhistory() {
-    print -z -- "$(history $@ | fzf +s --tac | sed -E 's/ *[0-9]*\*? *//' | sed -E 's/\\/\\\\/g')"
-}
-
 _fgitcheckout() {
   local branches=$(git branch | grep -v HEAD) &&
   local branch=$(echo "$branches" | fzf +m) &&
   test -n "$branch" &&
-  git checkout $(echo "$branch" | sed "s/.* //" | sed "s#remotes/[^/]*/##")
+  git checkout $(echo "$branch" | sed "s/.* //")
 }
 
 _fgitshow() {
@@ -89,6 +84,14 @@ _fgit() {
     fi
 }
 
+_fhistory() {
+    print -z -- "$(history $@ | fzf +s --tac | sed -E 's/ *[0-9]*\*? *//' | sed -E 's/\\/\\\\/g')"
+}
+
+_fpreview() {
+    fd --type f $(echo $TOMOCY_FD_DEFAULT_COMMAND_OPTS) | fzf --preview 'head -n 100 {}'
+}
+
 f() {
     local cmd="_f$1"
     if type $cmd > /dev/null 2>&1
@@ -99,24 +102,10 @@ f() {
     fi
 }
 
-_fcomplete() { 
-    local -a cmds=('cd' 'history' 'git')
+_fcomplete() {
     _arguments \
-    "1: :{_describe 'command' cmds}" \
-    '*:: :->args'
-
-    case $state in
-        args)
-            case $words[1] in
-                cd)            
-                    _arguments \
-                        '--max-depth[max search depth]'
-                    ;;
-                git)
-                    _alternative 'git:git:_git_commands'
-                    ;;
-            esac
-    esac
+    {-t,--type}'[type to search]' \
+    {-d,--max-depth}'[max depth to search in]'
 }
 
 compdef _fcomplete f
