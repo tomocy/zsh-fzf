@@ -105,7 +105,13 @@ f() {
 _fcomplete() {
     _arguments \
     {-t,--type}'[type to search]' \
-    {-d,--max-depth}'[max depth to search in]'
+    {-d,--max-depth}'[max depth to search in]' \
+    '*: :->cmd'
+
+    case $state in
+        cmd)
+            _alternative "f:f:_sudo"
+    esac
 }
 
 compdef _fcomplete f
