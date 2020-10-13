@@ -15,8 +15,10 @@ _fzf_compgen_dir() {
 }
 
 _f() {
+  local fd
+  fd="fd ${TOMOCY_FD_DEFAULT_COMMAND_OPTS[*]} ${*:2}"
   local arg
-  arg=$(fd "${TOMOCY_FD_DEFAULT_COMMAND_OPTS[@]}" . "${@:2}" | fzf) &&
+  arg=$(eval "$fd" | fzf) &&
     test -n "$arg" &&
     print -z -- "$1 $arg"
 }
@@ -24,7 +26,7 @@ _f() {
 _fccd() {
   local args
   args=$(echo "$@" | awk '{gsub("-t [a-zA-Z]|--type [a-zA-Z]", "", $0);print $0}' | xargs) &&
-    _f cd "$args" --type d
+    _f cd "$args --type d . ."
 }
 
 _fcpd() {
