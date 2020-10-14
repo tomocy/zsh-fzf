@@ -2,7 +2,23 @@
 
 export TOMOCY_FZF_DEFAULT_COMMAND_OPTS=(--extended --cycle --tac --ansi --multi --prompt '👉 ')
 export FZF_DEFAULT_OPTS="${TOMOCY_FZF_DEFAULT_COMMAND_OPTS[*]}"
-export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS --color=fg:#ffffff,bg:-1,hl:#00ffd8 --color=fg+:#00ffd8,bg+:#000000,hl+:#00ffd8 --color=info:#00ffd8,prompt:#09e7fb,pointer:#09e7fb --color=marker:#00ffd8,spinner:#09e7fb,header:#ffffff"
+if [[ "$TERM_PROGRAM" = "Apple_Terminal" ]]; then
+  COLOR_BLACK=0
+  COLOR_GREEN=2
+  COLOR_BLUE=4
+  COLOR_WHITE=7
+else
+  COLOR_BLACK="#000000"
+  COLOR_GREEN="#00ffd8"
+  COLOR_BLUE="#09e7fb"
+  COLOR_WHITE="#ffffff"
+fi
+export FZF_DEFAULT_OPTS="$FZF_DEFAULT_OPTS
+--color fg:$COLOR_WHITE,fg+:$COLOR_GREEN
+--color bg:$COLOR_BLACK,bg+:$COLOR_BLACK
+--color hl:$COLOR_GREEN,hl+:$COLOR_GREEN
+--color pointer:$COLOR_BLUE,marker:$COLOR_GREEN,spinner:$COLOR_BLUE
+--color info:$COLOR_GREEN,prompt:$COLOR_BLUE,header:$COLOR_WHITE"
 export TOMOCY_FD_DEFAULT_COMMAND_OPTS=(--hidden --follow --exclude .git)
 export FZF_DEFAULT_COMMAND="fd ${TOMOCY_FD_DEFAULT_COMMAND_OPTS[*]} . ."
 
