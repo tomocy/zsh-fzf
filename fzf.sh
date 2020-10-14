@@ -1,7 +1,6 @@
 #!/bin/zsh
 
-export TOMOCY_FZF_DEFAULT_COMMAND_OPTS=(--extended --cycle --tac --ansi --multi --prompt '👉 ')
-export FZF_DEFAULT_OPTS="${TOMOCY_FZF_DEFAULT_COMMAND_OPTS[*]}"
+export FZF_DEFAULT_OPTS="--extended --cycle --tac --ansi --multi --prompt='-➜ '"
 if [[ "$TERM_PROGRAM" = "Apple_Terminal" ]]; then
   COLOR_BLACK=0
   COLOR_GREEN=2
