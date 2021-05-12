@@ -43,7 +43,7 @@ fcode() {
 
 fadd() {
   local files
-  files=$(git ls-files --deleted --modified --others --exclude-standard | fcat --multi)
+  files=$(git ls-files --deleted --modified --others --exclude-standard | fzf --preview 'git diff --color=always {}' --multi)
   files=$(printf "$files" | tr '\n' ' ')
   [[ -n "$files" ]] && print -z "git add $files"
 }
